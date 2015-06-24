@@ -34,12 +34,14 @@
     self.textField.backgroundColor = [UIColor colorWithWhite:220/225.0f alpha:1];
     self.textField.delegate = self;
 
-    //request URL to load in web view
-    NSString *urlString = @"http://wikipedia.org";
-    NSURL *url = [NSURL URLWithString:urlString];
-    NSURLRequest *request = [NSURLRequest requestWithURL:url];
-    [self.webview loadRequest:request];
-
+    //request URL to load in web view: next(remove hardcore URL)
+    
+    /*  NSString *urlString = @"http://wikipedia.org";
+        NSURL *url = [NSURL URLWithString:urlString];
+        NSURLRequest *request = [NSURLRequest requestWithURL:url];
+        [self.webview loadRequest:request];
+    */
+    
     [mainView addSubview:self.webview];     //add subView to mainView
     self.view = mainView;
 }
@@ -68,6 +70,30 @@
     self.textField.frame = CGRectMake(0, 0, width, itemHeight);
     self.webview.frame = CGRectMake(0, CGRectGetMaxY(self.textField.frame), width, browserHeight);
 }
+
+//to make UIWebView load URL we enter into the text field
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    [textField resignFirstResponder];
+    
+    NSString *URLString = textField.text;
+    
+    NSURL *URL = [NSURL URLWithString:URLString];
+    
+    if (URL) {
+        NSURLRequest *request = [NSURLRequest requestWithURL:URL];
+        [self.webview loadRequest:request];
+    }
+    
+    return NO;
+}
+
+
+
+
+
+
+
+
 
 
 @end
