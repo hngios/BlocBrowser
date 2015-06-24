@@ -15,6 +15,7 @@
 		30CAEB731B3B4E1300D06402 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 30CAEB711B3B4E1300D06402 /* LaunchScreen.storyboard */; };
 		30CAEB7E1B3B4E1300D06402 /* BlocBrowserTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 30CAEB7D1B3B4E1300D06402 /* BlocBrowserTests.m */; };
 		30CAEB891B3B4E1300D06402 /* BlocBrowserUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 30CAEB881B3B4E1300D06402 /* BlocBrowserUITests.m */; };
+		30CAEB9B1B3B504600D06402 /* BLCWebBrowserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 30CAEB9A1B3B504600D06402 /* BLCWebBrowserViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +52,8 @@
 		30CAEB841B3B4E1300D06402 /* BlocBrowserUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BlocBrowserUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		30CAEB881B3B4E1300D06402 /* BlocBrowserUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BlocBrowserUITests.m; sourceTree = "<group>"; };
 		30CAEB8A1B3B4E1300D06402 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		30CAEB991B3B504600D06402 /* BLCWebBrowserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLCWebBrowserViewController.h; sourceTree = "<group>"; };
+		30CAEB9A1B3B504600D06402 /* BLCWebBrowserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BLCWebBrowserViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +84,8 @@
 		30CAEB571B3B4E1200D06402 = {
 			isa = PBXGroup;
 			children = (
+				30CAEB991B3B504600D06402 /* BLCWebBrowserViewController.h */,
+				30CAEB9A1B3B504600D06402 /* BLCWebBrowserViewController.m */,
 				30CAEB621B3B4E1300D06402 /* BlocBrowser */,
 				30CAEB7C1B3B4E1300D06402 /* BlocBrowserTests */,
 				30CAEB871B3B4E1300D06402 /* BlocBrowserUITests */,
@@ -272,6 +277,7 @@
 			files = (
 				30CAEB6B1B3B4E1300D06402 /* ViewController.m in Sources */,
 				30CAEB681B3B4E1300D06402 /* AppDelegate.m in Sources */,
+				30CAEB9B1B3B504600D06402 /* BLCWebBrowserViewController.m in Sources */,
 				30CAEB651B3B4E1300D06402 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
