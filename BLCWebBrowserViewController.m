@@ -17,6 +17,10 @@
 @property (nonatomic, strong) UIButton *forwardButton; //Add UIButton, forwardbutton
 @property (nonatomic, strong) UIButton *stopButton;    //Add UIButton, stopbutton
 @property (nonatomic, strong) UIButton *reloadButton;  //Add UIButton, reloadbutton
+@property (nonatomic, strong) UIActivityIndicatorView *activityIndicator; //Add UIButton activity indicator
+
+//@property (nonatomic, assign) BOOL isLoading; //Added to enable stop and refresh buttons: next(remove and add NSUInteger to keep tally of increments of start-finish loading frames especially when there are mutiple frames
+@property (nonatomic, assign) NSUInteger frameCount; //Added
 
 @end
 
@@ -65,19 +69,25 @@
     [self.reloadButton setTitle:NSLocalizedString(@"Refresh", @"Reload comnmand") forState:UIControlStateNormal];
     [self.reloadButton addTarget:self.webview action:@selector(reload) forControlEvents:UIControlEventTouchUpInside];
 
+    
+#pragma  mark - remove individual subview, add loop
+    /*
     [mainView addSubview:self.webview];
     [mainView addSubview:self.textField];
     [mainView addSubview:self.backButton];
     [mainView addSubview:self.forwardButton];
     [mainView addSubview:self.stopButton];
     [mainView addSubview:self.reloadButton];
+    */
     
+    //make a loop for adding subviews instead adding subview individually
+    for (UIView *viewToAdd in @[self.webview, self.textField, self.backButton, self.forwardButton, self.stopButton, self.reloadButton]) {
+        [mainView addSubview:viewToAdd];
+    }
     
+    self.view = mainView;
     
-    
-    
-    
-    //request URL to load in web view: next(remove hardcore URL)
+#pragma mark - request URL to load in web view: next(remove hardcore URL)
     
     /*  NSString *urlString = @"http://wikipedia.org";
         NSURL *url = [NSURL URLWithString:urlString];
@@ -85,10 +95,10 @@
         [self.webview loadRequest:request];
     */
     
-    [mainView addSubview:self.webview];     //add subView to mainView
-    [mainView addSubview:self.textField];
-    self.view = mainView;
+    //[mainView addSubview:self.webview];     //add subView to mainView: next (remove due to added above)
+    //[mainView addSubview:self.textField];   //add subView to mainView: next (remove due to added above)
     
+    self.view = mainView;
     
 }
 
@@ -98,6 +108,11 @@
     
     //set edgesForExtendedLayout property on our vc
     self.edgesForExtendedLayout = UIRectEdgeNone;
+    
+    //set activity indicator
+    self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
+    //[self.activityIndicator startAnimating]; //test turn on: next(remove)
     
 }
 
@@ -110,11 +125,22 @@
     //first, calculate some dimensions for url bar
     static const CGFloat itemHeight = 50;
     CGFloat width = CGRectGetWidth(self.view.bounds);
-    CGFloat browserHeight = CGRectGetHeight(self.view.bounds) - itemHeight;
+    //CGFloat browserHeight = CGRectGetHeight(self.view.bounds) - itemHeight; //remove
+    CGFloat browserHeight = CGRectGetHeight(self.view.bounds) - itemHeight - itemHeight; //add to accommodate buttons
+    CGFloat buttonWidth = CGRectGetWidth(self.view.bounds) / 4;
     
     //now, assign the frames
     self.textField.frame = CGRectMake(0, 0, width, itemHeight);
     self.webview.frame = CGRectMake(0, CGRectGetMaxY(self.textField.frame), width, browserHeight);
+    
+    //add loop to handle positioning of each button
+    CGFloat currentButtonX = 0;
+    
+    for (UIButton *thisButton in @[self.backButton, self.forwardButton, self.stopButton, self.reloadButton]) {
+        thisButton.frame = CGRectMake(currentButtonX, CGRectGetMaxY(self.webview.frame), buttonWidth, itemHeight);
+        currentButtonX += buttonWidth;
+    }
+    
 }
 
 #pragma mark - UITextFieldDelegate
@@ -140,17 +166,66 @@
     return NO;
 }
 
-#pragma UIWebViewDelegate
+#pragma mark - UIWebViewDelegate
 
 //will call if web page fails to load
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *) error {
+    if (error.code != -999) {   //added
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", @"Error")
                                                     message:[error localizedDescription]
                                                     delegate:nil
                                                     cancelButtonTitle:NSLocalizedString(@"OK", nil)
                                                     otherButtonTitles:nil];
     [alert show];
-
 }
+    
+//update buttons and titles
+    [self updateButtonsAndTitle];
+    self.frameCount--;  //added for frameCount
+    }
+#pragma mark - Miscellaneous
+//update title in UINavigationBar
+
+- (void) updateButtonsAndTitle {
+    NSString *webpageTitle = [self.webview stringByEvaluatingJavaScriptFromString:@"document.title"];
+
+    if (webpageTitle) {
+        self.title = webpageTitle;
+    } else {
+        self.title = self.webview.request.URL.absoluteString;
+    }
+    
+    //if (self.isLoading) {   //removed for frameCount
+    if (self.frameCount > 0) {
+    [self.activityIndicator startAnimating];
+        
+    } else {
+        [self.activityIndicator stopAnimating];
+}
+
+    //next forward and back buttons
+    self.backButton.enabled = [self.webview canGoBack];
+    self.forwardButton.enabled = [self.webview canGoForward];
+    //change buttons' enabled state based on current value of isLoading
+    //self.stopButton.enabled = self.isLoading;   //removed
+    //self.reloadButton.enabled = !self.isLoading; //removed
+    self.stopButton.enabled = self.frameCount > 0;  //added for frameCount
+    self.reloadButton.enabled = self.frameCount == 0;  //added for FrameCount
+    
+}
+
+//need to call this method whenever page starts or stops loading.
+- (void)webViewDidStartLoad:(UIWebView *)webView {
+    //self.isLoading = YES; //removed to add frameCount below
+    self.frameCount++; //added to keep tally of start frame loading
+    [self updateButtonsAndTitle];
+}
+
+- (void)webViewDidFinishLoad:(UIWebView *)webView {
+    //self.isLoading = NO; //removed to add frameCount below
+    self.frameCount++; //added to keep tally of finished frame loading
+    [self updateButtonsAndTitle];
+}
+
 
 @end
