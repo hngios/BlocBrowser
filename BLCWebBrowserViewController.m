@@ -56,7 +56,9 @@
     
     self.reloadButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [self.reloadButton setEnabled:NO];
-
+    
+#pragma  mark - remove all old view hierarchy
+    /*
     [self.backButton setTitle:NSLocalizedString(@"Back", @"Back comnmand") forState:UIControlStateNormal];
     [self.backButton addTarget:self.webview action:@selector(goBack) forControlEvents:UIControlEventTouchUpInside];
     
@@ -68,7 +70,8 @@
     
     [self.reloadButton setTitle:NSLocalizedString(@"Refresh", @"Reload comnmand") forState:UIControlStateNormal];
     [self.reloadButton addTarget:self.webview action:@selector(reload) forControlEvents:UIControlEventTouchUpInside];
-
+*/
+    [self addButtonTargets];
     
 #pragma  mark - remove individual subview, add loop
     /*
@@ -171,12 +174,20 @@
 //will call if web page fails to load
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *) error {
     if (error.code != -999) {   //added
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", @"Error")
+   
+    // remove to complete assignment for submittal
+    /* UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", @"Error")
                                                     message:[error localizedDescription]
                                                     delegate:nil
                                                     cancelButtonTitle:NSLocalizedString(@"OK", nil)
                                                     otherButtonTitles:nil];
     [alert show];
+    */
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Welcome!", @"Welcome title")
+                                                        message:NSLocalizedString(@"Get excited to use the best web browser ever!", @"Welcome comment")
+                                                       delegate:nil
+                                              cancelButtonTitle:NSLocalizedString(@"OK, I'm excited!", @"Welcome button title") otherButtonTitles:nil];
+        [alert show];
 }
     
 //update buttons and titles
@@ -210,7 +221,9 @@
     //self.stopButton.enabled = self.isLoading;   //removed
     //self.reloadButton.enabled = !self.isLoading; //removed
     self.stopButton.enabled = self.frameCount > 0;  //added for frameCount
-    self.reloadButton.enabled = self.frameCount == 0;  //added for FrameCount
+    //self.reloadButton.enabled = self.frameCount == 0;  //added for FrameCount: next(removed to add below)
+    self.reloadButton.enabled = self.webview.request.URL && self.frameCount == 0; //add to update logic for enabling reload button
+    
     
 }
 
@@ -225,6 +238,35 @@
     //self.isLoading = NO; //removed to add frameCount below
     self.frameCount++; //added to keep tally of finished frame loading
     [self updateButtonsAndTitle];
+}
+
+#pragma mark - create new empty web view and adds it back in
+
+- (void) resetWebView {
+    [self.webview removeFromSuperview];
+    
+    UIWebView *newWebView = [[UIWebView alloc] init];
+    newWebView.delegate = self;
+    [self.view addSubview:newWebView];
+    
+    self.webview = newWebView;
+    
+    [self addButtonTargets];
+    
+    self.textField.text = nil;
+    [self updateButtonsAndTitle];
+}
+
+#pragma mark - call addButtonTargets to point the buttons to new web view
+
+- (void) addButtonTargets {
+    for (UIButton *button in @[self.backButton, self.forwardButton, self.stopButton, self.reloadButton]){
+        [button removeTarget:nil action:NULL forControlEvents:UIControlEventTouchUpInside];
+}
+    [self.backButton addTarget:self.webview action:@selector(goBack) forControlEvents:UIControlEventTouchUpInside];
+    [self.forwardButton addTarget:self.webview action:@selector(goForward) forControlEvents:UIControlEventTouchUpInside];
+    [self.stopButton addTarget:self.webview action:@selector(stopLoading) forControlEvents:UIControlEventTouchUpInside];
+    [self.reloadButton addTarget:self.webview action:@selector(reload) forControlEvents:UIControlEventTouchUpInside];
 }
 
 
