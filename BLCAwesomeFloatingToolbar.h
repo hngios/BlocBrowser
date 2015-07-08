@@ -10,20 +10,23 @@
 
 @class BLCAwesomeFloatingToolbar;
 
-@protocol BLCAwesomeFloatingToolBarDelegate <NSObject>
+@protocol BLCAwesomeFloatingToolBarDelegate <NSObject>  //add because class isn't defined when placed before @interface, promise to complier that we will learn this delegate later
 
 @optional
 
-- (void) floatingToolbar:(BLCAwesomeFloatingToolbar *)toolbar didSelectButtonWithTitle:(NSString *)title;
+- (void) floatingToolbar:(BLCAwesomeFloatingToolbar *)toolbar didSelectButtonWithTitle:(NSString *)title; //if delegate implements it, it will be called when user taps a button
 
-@end
+@end  // definition of delegate protocol has ended
+
+
+#pragma mark -interface toolbar itself, which declares: 1,2,3
 
 @interface BLCAwesomeFloatingToolbar : UIView
 
-- (instancetype) initWithFourTitles:(NSArray *)titles;
+- (instancetype) initWithFourTitles:(NSArray *)titles;  // 1. a custom initializer to use, which take array of four titles as a argument
 
-- (void) setEnabled:(BOOL)enabled forButtonWithTitle:(NSString *)title;
+- (void) setEnabled:(BOOL)enabled forButtonWithTitle:(NSString *)title;  // 2. method enables/disables buton based on title passed in
 
-@property (nonatomic, weak) id <BLCAwesomeFloatingToolBarDelegate> delegate;
+@property (nonatomic, weak) id <BLCAwesomeFloatingToolBarDelegate> delegate; // 3. a delegate property use if a delegate is desired
 
 @end
