@@ -155,6 +155,19 @@
     
     //The user didn't type http: or https:
     if (!URL.scheme) {
+        // if text field has spaces in it:
+        NSArray *urlComponents = [URLString componentsSeparatedByString:@" "];
+        BOOL textFieldHasSpaces = [urlComponents count] > 1;
+        if (textFieldHasSpaces) {
+            // convert spaces to +
+            NSString *urlWithoutSpaces = [URLString stringByReplacingOccurrencesOfString:@" " withString:@"+"];
+            // add "http://google.com/search?q=" to beginning of it
+            
+        }
+        
+        
+        
+        
         URL = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@", URLString]];
     }
     
