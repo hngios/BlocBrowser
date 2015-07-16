@@ -36,11 +36,11 @@
     
     //build textField and add it as a subview of mainview
     self.textField = [[UITextField alloc] init];
-    self.textField.keyboardType = UIKeyboardTypeURL;
+    self.textField.keyboardType = UIKeyboardTypeDefault;
     self.textField.returnKeyType = UIReturnKeyDone;
     self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
     self.textField.autocorrectionType = UITextAutocorrectionTypeNo;
-    self.textField.placeholder = NSLocalizedString(@"Website URL", @"Placeholder text for web browser URL field");
+    self.textField.placeholder = NSLocalizedString(@"Website URL OR SEARCH", @"Placeholder text for web browser URL field");
     self.textField.backgroundColor = [UIColor colorWithWhite:220/225.0f alpha:1];
     self.textField.delegate = self;
     
@@ -158,7 +158,24 @@
     
     //The user didn't type http: or https:
     if (!URL.scheme) {
-        URL = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@", URLString]];
+        // if text field has spaces in it:
+        NSArray *urlComponents = [URLString componentsSeparatedByString:@" "];
+        BOOL textFieldHasSpaces = [urlComponents count] > 1;
+        if (textFieldHasSpaces) {
+            // convert spaces to +
+                                        //   [[[URLString stringByReplacingOccurrencesOfString:@" " withString:@"+"];
+            NSString *urlWithoutSpaces = [URLString stringByReplacingOccurrencesOfString:@" " withString:@"+"];
+            
+            // add "http://google.com/search?q=" to beginning of it
+            urlWithoutSpaces = [@"http://google.com/search?q=" stringByAppendingString:urlWithoutSpaces];
+            URLString = urlWithoutSpaces;
+            URL = [NSURL URLWithString:URLString];
+        }
+        else {
+        
+         URL = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@", URLString]];
+        }
+   
     }
     
     if (URL) {
