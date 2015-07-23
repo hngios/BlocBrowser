@@ -8,7 +8,7 @@
 
 #import "BLCAwesomeFloatingToolbar.h"
 
-@interface BLCAwesomeFloatingToolbar : ()
+@interface BLCAwesomeFloatingToolbar ()
 
 @property (nonatomic, strong) NSArray *currentTitles;
 @property (nonatomic, strong) NSArray *colors;

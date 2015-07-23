@@ -115,8 +115,7 @@
     */
     
     for (UIView *viewToAdd in @[self.webview, self.textField, self.awesomeToolbar]) {
-        
-    }
+          [mainView addSubview:viewToAdd];    }
     
     self.view = mainView;
     
@@ -179,7 +178,9 @@
     }
     */
     // add
-    self.awesomeToolbar.frame = CGRectMake(20, 100, 280, 60);
+//    self.awesomeToolbar.frame = CGRectMake(20, 100, 280, 60);
+//    self.awesomeToolbar.frame = CGRectMake(20, 100, 280, 90);
+      self.awesomeToolbar.frame = CGRectMake(50, 100, 260, 100);
 
 }
 
@@ -216,19 +217,18 @@
 
 
 #pragma mark - BLCAwesomeFloatingToolbarDelegate
-
+//update use constant defined in beginning
 - (void) floatingToolbar:(BLCAwesomeFloatingToolbar *)toolbar didSelectButtonWithTitle:(NSString *)title {
-    if ([title isEqual:NSLocalizedString(@"Back", @"Back command")]) {
+    if ([title isEqual:kBLCWebBrowserBackString]) {
         [self.webview goBack];
-    } else if ([title isEqual:NSLocalizedString(@"Forward", @"Forward command")]) {
+    } else if ([title isEqual:kBLCWebBrowserForwardString]) {
         [self.webview goForward];
-    } else if ([title isEqual:NSLocalizedString(@"Stop", @"Stop command")]) {
+    } else if ([title isEqual:kBLCWebBrowserStopString]) {
         [self.webview stopLoading];
-    } else if ([title isEqual:NSLocalizedString(@"Refresh", @"Reload command")]) {
+    } else if ([title isEqual:kBLCWebBrowserRefreshString]) {
         [self.webview reload];
     }
 }
-
 
 #pragma mark - UITextFieldDelegate
 
