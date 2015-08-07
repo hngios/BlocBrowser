@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "BLCWebBrowserViewController.h" //import this
+#import "BLCAwesomeFloatingToolbar.h" //import this
 
 
 @interface AppDelegate ()

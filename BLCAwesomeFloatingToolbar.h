@@ -15,7 +15,9 @@
 @optional
 
 - (void) floatingToolbar:(BLCAwesomeFloatingToolbar *)toolbar didSelectButtonWithTitle:(NSString *)title; //if delegate implements it, it will be called when user taps a button
-
+- (void) floatingToolbar:(BLCAwesomeFloatingToolbar *)toolbar didTryToPanWithOffset:(CGPoint)offset; // add delegate to be moved the direction it wishes to move
+- (void) pinchGestureDetected:(UIPinchGestureRecognizer *)recognizer; // add delegate to implement pinch gesture
+    
 @end  // definition of delegate protocol has ended
 
 
@@ -30,3 +32,5 @@
 @property (nonatomic, weak) id <BLCAwesomeFloatingToolBarDelegate> delegate; // 3. a delegate property use if a delegate is desired
 
 @end
+
+

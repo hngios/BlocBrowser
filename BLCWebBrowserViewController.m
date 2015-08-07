@@ -323,5 +323,28 @@
     [self updateButtonsAndTitle];
 }
 
+- (void) floatingToolbar:(BLCAwesomeFloatingToolbar *)toolbar didTryToPanWithOffset:(CGPoint)offset {
+    CGPoint startingPoint = toolbar.frame.origin;
+    CGPoint newPoint = CGPointMake(startingPoint.x + offset.x, startingPoint.y + offset.y);
+    
+    CGRect potentialNewFrame = CGRectMake(newPoint.x, newPoint.y, CGRectGetWidth(toolbar.frame), CGRectGetHeight(toolbar.frame));
+    
+    if (CGRectContainsRect(self.view.bounds, potentialNewFrame)) {
+        toolbar.frame = potentialNewFrame;
+    }
+}
+
+- (void) pinchGestureDetected:(UIPinchGestureRecognizer *)recognizer{
+    
+    if (recognizer.state == UIGestureRecognizerStateBegan || recognizer.state == UIGestureRecognizerStateChanged)
+    {
+        CGFloat scale = [recognizer scale];
+        
+        [recognizer.view setTransform:CGAffineTransformScale(recognizer.view.transform, scale, scale)];
+        [recognizer setScale:1.0];
+        
+    }
+
+}
 
 @end

@@ -14,13 +14,23 @@
 @property (nonatomic, strong) NSArray *colors;
 @property (nonatomic, strong) NSArray *labels;
 @property (nonatomic, weak) UILabel *currentLabel;
+@property (nonatomic, strong) UITapGestureRecognizer *tapGesture;
+@property (nonatomic, strong) UIPanGestureRecognizer *panGesture;
+@property (nonatomic, strong) UIPinchGestureRecognizer *pinchGesture;
+@property (nonatomic, strong) UILongPressGestureRecognizer *longPressedGesture;
+
+@property (nonatomic) CFTimeInterval minimumPressedDuraction;  // default is 0.5 seconds.
+@property (nonatomic) NSUInteger numberOfTouchesRequired; // default finger is 1.
+@property (nonatomic) NSUInteger numberOfTapsRequired; // default taps is 0.
+@property (nonatomic) CGFloat allowableMovement; // default distance is 10 points.
+
 
 @end
 
 
 @implementation BLCAwesomeFloatingToolbar
 
-
+//Create and initialize recognizer at end of initWithFourTitles:
 - (instancetype) initWithFourTitles:(NSArray *)titles {
     // First, call the superclass (UIView)'s initializer, to make sure we do all that setup first.
     self = [super init];
@@ -60,8 +70,15 @@
         for (UILabel *thisLabel in self.labels) {
             [self addSubview:thisLabel];
         }
+        
+ //       self.tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(longPressedGestureDetected:)];
+        self.tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapFired:)];
+        [self addGestureRecognizer:self.tapGesture];
+        self.panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panFired:)];
+        [self addGestureRecognizer:self.panGesture];
+        self.longPressedGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressedGestureDetected:)];
+        [self addGestureRecognizer:self.longPressedGesture];
     }
-    
     return self;
 }
 
@@ -97,6 +114,80 @@
     }
 }
 
+- (void) tapFired:(UITapGestureRecognizer *)recognizer {
+    if (recognizer.state == UIGestureRecognizerStateRecognized) {  // first, check proper state,  in our case, tap completed and recognized                              state was switched to UIGestureRecognizerStateRecognized
+      
+        CGPoint location = [recognizer locationInView:self];        //gives us x,y coordinate where gesture occurred with respect to our bounds
+        UIView *tappedView = [self hitTest:location withEvent:nil]; //to discover which view received the tap at that given location
+        
+        if ([self.labels containsObject:tappedView]) {              //check view tapped in fact one of our toolbar labels, if so, verify                  delegate for compatibility before performing the appropriate method call.
+            
+            if ([self.delegate respondsToSelector:@selector(floatingToolbar:didSelectButtonWithTitle:)]) {
+                [self.delegate floatingToolbar:self didSelectButtonWithTitle:((UILabel *)tappedView).text];
+            }
+        }
+    }
+}
+
+//how far user's finger moved in each direction since touch event began, small linear collection of small pans traveling a few pixels at a time
+//again, check proper state, recognized, and switch to UIGestureRecognizerStateChanged
+//reset to get difference of each mini-pan everytime method is called
+
+- (void) panFired:(UIPanGestureRecognizer *)recognizer {
+    
+    if (recognizer.state == UIGestureRecognizerStateChanged) {
+        CGPoint translation = [recognizer translationInView:self];
+        NSLog(@"New translation: %@", NSStringFromCGPoint(translation));
+        if ([self.delegate respondsToSelector:@selector(floatingToolbar:didTryToPanWithOffset:)]) {
+            [self.delegate floatingToolbar:self didTryToPanWithOffset:translation];
+        }
+        
+        [recognizer setTranslation:CGPointZero inView:self];
+    }
+}
+
+// Finally, we need to implement floatingToolbar:didTryToPanWithOffset in BLCWebBrowserViewController because that's where the BLCAwesomeFloatingToolbar will actually be assigned a new frame:
+//  We begin by getting the top-left corner of where the toolbar is currently located. newPoint is where the future top-left corner is stored by adding the difference in x and the difference in y to the original top-left coordinate. Then we create a new CGRect which represents the toolbars potential new frame.We say potential because we want to make sure that we don't push the toolbar off the screen. CGRectContainsRect(CGRect rect1, CGRect rect2) will return YES if the rect2's bounds are contained entirely by rect1, or NO otherwise. If the test passes, we set the toolbar's new frame and it's done.
+
+
+- (void) longPressedGestureDetected: (UILongPressGestureRecognizer *)recognizer{
+    
+    if (recognizer.state == UIGestureRecognizerStateBegan || recognizer.state == UIGestureRecognizerStateEnded)
+    {
+     
+    }
+    else if (recognizer.state == UIGestureRecognizerStateRecognized)
+    {
+        
+        CGPoint location = [recognizer locationInView:self];        //gives us x,y coordinate where gesture occurred with respect to our bounds
+        UIView *tappedView = [self hitTest:location withEvent:nil]; //to discover which view received the tap at that given location
+        [self rotateColors];
+    }
+
+}
+
+NSInteger colorOffset = 1;
+- (void) rotateColors {
+    
+    for (NSInteger i = 0; i < [self.labels count]; i++) {
+        UIColor *colorForThisLabel = [self.colors objectAtIndex:(i+colorOffset%4)];
+
+        UILabel *thisLabel = self.labels[i];
+        thisLabel.backgroundColor = colorForThisLabel;
+        
+        
+
+    }
+
+    colorOffset++;
+    
+}
+
+
+
+
+
+
 #pragma mark - Touch Handling
 
 - (UILabel *) labelFromTouches:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -107,7 +198,9 @@
 }
 
 
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+/* NO LONGER NEED
+ 
+ - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     
     UILabel *label = [self labelFromTouches:touches withEvent:event];
     
@@ -147,7 +240,7 @@
     self.currentLabel.alpha = 1;
     self.currentLabel = nil;
 }
-
+*/
 
 #pragma mark - Button Enabling
 
