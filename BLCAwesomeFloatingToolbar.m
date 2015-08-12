@@ -19,11 +19,13 @@
 @property (nonatomic, strong) UIPinchGestureRecognizer *pinchGesture;
 @property (nonatomic, strong) UILongPressGestureRecognizer *longPressedGesture;
 
+/*
+Inherit from UILongPressGestureRecognzier:
 @property (nonatomic) CFTimeInterval minimumPressedDuraction;  // default is 0.5 seconds.
 @property (nonatomic) NSUInteger numberOfTouchesRequired; // default finger is 1.
 @property (nonatomic) NSUInteger numberOfTapsRequired; // default taps is 0.
 @property (nonatomic) CGFloat allowableMovement; // default distance is 10 points.
-
+*/
 
 @end
 
@@ -76,7 +78,11 @@
         [self addGestureRecognizer:self.tapGesture];
         self.panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panFired:)];
         [self addGestureRecognizer:self.panGesture];
+        self.pinchGesture = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(pinchGestureDetected:)];
+        [self addGestureRecognizer:self.pinchGesture];
         self.longPressedGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressedGestureDetected:)];
+        self.longPressedGesture.numberOfTapsRequired = 1;
+        self.longPressedGesture.minimumPressDuration = 0.5;
         [self addGestureRecognizer:self.longPressedGesture];
     }
     return self;
@@ -115,6 +121,7 @@
 }
 
 - (void) tapFired:(UITapGestureRecognizer *)recognizer {
+    NSLog(@"Tap Fired");
     if (recognizer.state == UIGestureRecognizerStateRecognized) {  // first, check proper state,  in our case, tap completed and recognized                              state was switched to UIGestureRecognizerStateRecognized
       
         CGPoint location = [recognizer locationInView:self];        //gives us x,y coordinate where gesture occurred with respect to our bounds
@@ -138,6 +145,7 @@
     if (recognizer.state == UIGestureRecognizerStateChanged) {
         CGPoint translation = [recognizer translationInView:self];
         NSLog(@"New translation: %@", NSStringFromCGPoint(translation));
+       
         if ([self.delegate respondsToSelector:@selector(floatingToolbar:didTryToPanWithOffset:)]) {
             [self.delegate floatingToolbar:self didTryToPanWithOffset:translation];
         }
@@ -151,22 +159,20 @@
 
 
 - (void) longPressedGestureDetected: (UILongPressGestureRecognizer *)recognizer{
-    
+    NSLog(@"Long Press Gesture Detected");
     if (recognizer.state == UIGestureRecognizerStateBegan || recognizer.state == UIGestureRecognizerStateEnded)
     {
      
     }
     else if (recognizer.state == UIGestureRecognizerStateRecognized)
     {
-        
-        CGPoint location = [recognizer locationInView:self];        //gives us x,y coordinate where gesture occurred with respect to our bounds
-        UIView *tappedView = [self hitTest:location withEvent:nil]; //to discover which view received the tap at that given location
         [self rotateColors];
     }
 
 }
 
 NSInteger colorOffset = 1;
+
 - (void) rotateColors {
     
     for (NSInteger i = 0; i < [self.labels count]; i++) {

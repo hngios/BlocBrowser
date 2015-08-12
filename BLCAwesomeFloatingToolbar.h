@@ -17,6 +17,8 @@
 - (void) floatingToolbar:(BLCAwesomeFloatingToolbar *)toolbar didSelectButtonWithTitle:(NSString *)title; //if delegate implements it, it will be called when user taps a button
 - (void) floatingToolbar:(BLCAwesomeFloatingToolbar *)toolbar didTryToPanWithOffset:(CGPoint)offset; // add delegate to be moved the direction it wishes to move
 - (void) pinchGestureDetected:(UIPinchGestureRecognizer *)recognizer; // add delegate to implement pinch gesture
+- (void) longPressedGestureDetected:(UILongPressGestureRecognizer *)recognizer; // add delegate to implement longPressed gesture
+
     
 @end  // definition of delegate protocol has ended
 
